@@ -1,0 +1,79 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  namespace: factorial
+  creationTimestamp: null
+  labels:
+    app: my-factorial-cache-app
+  name: my-factorial-cache-app
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: my-factorial-cache-app
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        app: my-factorial-cache-app
+    spec:
+      volumes:
+      - name: cache-volume
+        emptyDir:
+          medium: Memory
+      - name: log-volume
+        persistentVolumeClaim:
+          claimName: cache-log-storage-claim
+      terminationGracePeriodSeconds: 60
+      containers:
+      - image: hyuklassic/factorial-cache-app:0.0.5
+        volumeMounts:
+        - mountPath: /factorial/cache
+          name: cache-volume
+        - mountPath: /factorial/log
+          name: log-volume
+        name: factorial-cache-app
+        env:
+          - name: APP_LANGUAGE
+            valueFrom:
+              configMapKeyRef:
+                name: factorial-config
+                key: language
+          - name: API_KEY
+            valueFrom:
+              secretKeyRef:
+                name: factorial-secret
+                key: api-key
+        resources: {}
+        lifecycle:
+          preStop:
+            exec:
+              command: ["/bin/sh","-c","sleep 10"]
+        startupProbe:
+          httpGet:
+            path: /probe/healthcheck
+            port: 8080
+          initialDelaySeconds: 5
+          failureThreshold: 10
+          periodSeconds: 1
+        readinessProbe:
+          httpGet:
+            path: /probe/healthcheck
+            port: 8080
+          initialDelaySeconds: 5
+          failureThreshold: 3
+          successThreshold: 2
+          periodSeconds: 1
+        livenessProbe:
+          httpGet:
+            path: /probe/healthcheck
+            port: 8080
+          initialDelaySeconds: 5
+          failureThreshold: 7
+          periodSeconds: 1
+status: {}
