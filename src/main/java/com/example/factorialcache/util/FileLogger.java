@@ -22,9 +22,8 @@ public class FileLogger {
                     host + "::" + message + System.lineSeparator(),
                     CREATE, APPEND
             );
-        }
-        catch (IOException e) {
-            throw new RuntimeException("Error writing to log file", e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
 
     }

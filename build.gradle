@@ -31,7 +31,7 @@ jib{
     }
     to{
         image = 'hyuklassic/factorial-cache-app'
-        tags = ['latest', '0.0.5']
+        tags = ['latest', '0.0.7']
     }
     container{
         creationTime = 'USE_CURRENT_TIMESTAMP'

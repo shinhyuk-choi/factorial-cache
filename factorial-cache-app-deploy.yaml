@@ -31,11 +31,11 @@ spec:
           claimName: cache-log-storage-claim
       terminationGracePeriodSeconds: 60
       containers:
-      - image: hyuklassic/factorial-cache-app:0.0.5
+      - image: hyuklassic/factorial-cache-app:0.0.7
         volumeMounts:
         - mountPath: /factorial/cache
           name: cache-volume
-        - mountPath: /factorial/log
+        - mountPath: /factorial/logs
           name: log-volume
         name: factorial-cache-app
         env:
